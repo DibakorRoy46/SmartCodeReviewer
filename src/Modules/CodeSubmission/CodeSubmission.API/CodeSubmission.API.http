@@ -1,0 +1,6 @@
+@CodeSubmission.API_HostAddress = http://localhost:5118
+
+GET {{CodeSubmission.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

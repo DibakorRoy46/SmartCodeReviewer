@@ -1,0 +1,16 @@
+<Solution>
+  <Folder Name="/Api/">
+    <Project Path="API/CodeReviewerApp.API/CodeReviewerApp.API.csproj" Id="2a921eeb-b98c-40fe-8873-dfde6effb675" />
+  </Folder>
+  <Folder Name="/Modules/" />
+  <Folder Name="/Modules/CodeSubmission/">
+    <Project Path="Modules/CodeSubmission/CodeSubmission.Application/CodeSubmission.Application.csproj" />
+    <Project Path="Modules/CodeSubmission/CodeSubmission.Domain/CodeSubmission.Domain.csproj" />
+    <Project Path="Modules/CodeSubmission/CodeSubmission.Infrastructure/CodeSubmission.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/Shared/">
+    <Project Path="Shared/Shared.Application/Shared.Application.csproj" Id="af39ae9d-f9a4-41ab-870e-073447235c42" />
+    <Project Path="Shared/Shared.Domain/Shared.Domain.csproj" Id="07c96fa1-737e-46fa-98dc-b81d19699b80" />
+    <Project Path="Shared/Shared.Infrastructure/Shared.Infrastructure.csproj" Id="856f2e98-c811-46b6-97b9-c4551d916ce7" />
+  </Folder>
+</Solution>
