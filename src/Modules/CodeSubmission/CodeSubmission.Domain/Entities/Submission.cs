@@ -13,14 +13,14 @@ public class Submission : AggregateRoot<Guid>
     public string? PlainText { get; private set; }
     public string? FileName { get; private set; }
     public string? FilePath { get; private set; }
-    public UserId UserId { get; private set; }
+    public UserId SubmittedUserId { get; private set; }
     public StatusEnum Status { get; private set; }
 
     // -------- Required by ORM --------
     private Submission() { }
 
     private Submission(Guid id,UserId userId,LanguageEnum language,SubmissionTypeEnum submissionType,
-        string? code,string? plainText,string? fileName,string? filePath)
+        string code,string? plainText,string? fileName,string? filePath)
     {
         Id = id;
         Language = language;
@@ -30,82 +30,31 @@ public class Submission : AggregateRoot<Guid>
         FileName = fileName;
         FilePath = filePath;
         Status = StatusEnum.Submitted;
+        SubmittedUserId = userId;
 
-        Submission.CreateAudit(userId);
+        CreateAudit(userId);
         Validate();
     }
 
-    // ===============================
     // FACTORY METHODS (Creation)
-    // ===============================
+   
 
-    public static Submission CreateInline(
-        Guid id,
-        UserId userId,
-        LanguageEnum language,
-        string code)
+    public static Submission CreateInline(Guid id, string code,UserId userId,LanguageEnum language,string plainText)
     {
-        if (string.IsNullOrWhiteSpace(code))
+        if (string.IsNullOrWhiteSpace(plainText))
             throw new DomainException("Inline submission requires code.");
 
-        return new Submission(
-            id,
-            userId,
-            language,
-            SubmissionTypeEnum.InlineCode,
-            code,
-            null,
-            null,
-            null
-        );
+        return new Submission(id,userId,language,SubmissionTypeEnum.InlineCode,code, plainText,null,null);
     }
 
-    public static Submission CreatePlainText(
-        Guid id,
-        UserId userId,
-        LanguageEnum language,
-        string text)
-    {
-        if (string.IsNullOrWhiteSpace(text))
-            throw new DomainException("Plain text submission cannot be empty.");
-
-        return new Submission(
-            id,
-            userId,
-            language,
-            SubmissionTypeEnum.PlainText,
-            null,
-            text,
-            null,
-            null
-        );
-    }
-
-    public static Submission CreateFile(
-        Guid id,
-        UserId userId,
-        LanguageEnum language,
-        string fileName,
-        string filePath)
+    public static Submission CreateFile(Guid id, string code,UserId userId,LanguageEnum language,
+        string fileName,string filePath)
     {
         if (string.IsNullOrWhiteSpace(fileName) || string.IsNullOrWhiteSpace(filePath))
             throw new DomainException("File submission requires file name and path.");
 
-        return new Submission(
-            id,
-            userId,
-            language,
-            SubmissionTypeEnum.File,
-            null,
-            null,
-            fileName,
-            filePath
-        );
+        return new Submission(id,userId,language,SubmissionTypeEnum.File,code,null,fileName,filePath);
     }
-
-    // ===============================
-    // BEHAVIOR (State Transitions)
-    // ===============================
 
     public void MarkInReview(UserId reviewerId)
     {
@@ -128,17 +77,10 @@ public class Submission : AggregateRoot<Guid>
         UpdateAudit(reviewerId);
     }
 
-    // ===============================
-    // DOMAIN RULES
-    // ===============================
-
     private void Validate()
     {
-        if (SubmissionType == SubmissionTypeEnum.Inline && string.IsNullOrWhiteSpace(Code))
+        if (SubmissionType == SubmissionTypeEnum.InlineCode && string.IsNullOrWhiteSpace(PlainText))
             throw new DomainException("Inline submission must have code.");
-
-        if (SubmissionType == SubmissionTypeEnum.PlainText && string.IsNullOrWhiteSpace(PlainText))
-            throw new DomainException("Plain text submission must have content.");
 
         if (SubmissionType == SubmissionTypeEnum.File &&
             (string.IsNullOrWhiteSpace(FileName) || string.IsNullOrWhiteSpace(FilePath)))
